@@ -31,6 +31,10 @@ type AllProducts struct {
 	Quantity int    `json:"quantity"`
 }
 
+type Credentials struct {
+	Username string `json:"username"`
+}
+
 func addProduct(w http.ResponseWriter, r *http.Request) { //method that will take in the json from the hit endpoint, parse it, and create a NewProduct object from it. Then we will make a db query that inserts the attributes of that object.
 	var request NewProduct //making variable from our struct from our request json
 
@@ -116,13 +120,17 @@ func getProducts(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(products)
 }
 
+func loginCheck(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func handleRequest(corsMiddleware func(http.Handler) http.Handler) { //method that utilizes mux import for handling multiple requests (we will have many requests for our project)
 	myRouter := mux.NewRouter().StrictSlash(true) //creating a new router instance to handle http requests
 	myRouter.Use(corsMiddleware)                  //telling our router to use the cors parameters we set
 
 	myRouter.HandleFunc("/addProduct", addProduct) //every time this https://localhost:8080/addProduct endpoint is hit from our front end code, we will utilize the addProduct function/method
 	myRouter.HandleFunc("/inventory", getProducts)
-	//add more endpoints and associated funcs here
+	myRouter.HandleFunc("/login", loginCheck)
 	//add more endpoints and associated funcs here
 	//add more endpoints and associated funcs here
 	log.Fatal(http.ListenAndServe(":8080", myRouter)) //making our server address listen on port 8080
