@@ -1,0 +1,45 @@
+/*
+Current working insert commands.
+All int, float, and char fields listed as "value"
+replace as needed for front end and back end variables
+All tables have the database 'project' preceding them in commands
+All commands assume every fk assigned in tables have ON DELETE and ON UPDATE set to CASCADE
+*/
+
+--Sorting
+--sort vendors:
+SELECT vendor_name FROM project.vendors
+ORDER BY vendor_name;
+
+--sort categories
+SELECT cat_name FROM project.categories
+ORDER BY cat_name;
+
+--product inserts
+--basic product insert with seperate queries:
+SELECT category_id FROM project.categories
+WHERE category_name = "selected name";
+INSERT INTO project.products (Category_ID, Prod_Name, Prod_Price, Prod_Qty, Prod_Desc)
+VALUES ("id", "prod name", "price", "qty", "desc");
+
+--product insert with where clause:
+INSERT INTO project.products (Category_ID, Prod_name, Prod_Price, Prod_Qty, Prod_Desc)
+SELECT Category_ID, "new product", "cost", "qty", "desc"
+FROM project.categories
+WHERE categories.cat_name = "category name";
+
+--deleting product
+--product deletion:
+DELETE FROM project.products
+WHERE (Product_ID = 11);
+
+--modify product, all frields displayed, delete comment delimiter as needed
+--modifying product fields:
+UPDATE project.products
+SET
+--Prod_Name = "text",
+--Prod_Price = "num",
+--Prod_Qty = "num",
+--Prod_Desc = "text
+WHERE (Product_ID = "num");
+
