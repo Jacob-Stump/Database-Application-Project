@@ -1,6 +1,6 @@
 module database.project
 
-go 1.21.3
+go 1.21.0
 
 require (
 	github.com/gorilla/handlers v1.5.1

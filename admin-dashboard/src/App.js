@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-    
     // state hooks for the components
     const [selectedOption, setSelectedOption] = useState("Products");
     const [newProduct, setNewProduct] = useState({
-        vendor: "",
         category: "",
+        vendor: "",
         productName: "",
         price: "",
         quantity: "",
@@ -28,62 +27,21 @@ function App() {
     const handleInputChange = e => {
         const { name, value } = e.target;
         setNewProduct(prev => ({ ...prev, [name]: value }));
-
-        if (name === "vendor") {
-            fetchCategoriesForVendor(value);
-        }
-    };
-
-    const fetchCategoriesForVendor = async (vendorId) => {
-        if (!vendorId) {
-            // the categories drop down list will be empty if a vendor is not
-            // selected
-            setCategories([]);
-        }
-        
-        try {
-            setLoading(true);
-            // this needs to change
-            const response = await fetch(`http://localhost:8080/categories/${newProduct.vendor}`);
-            if (!response.ok) {
-                throw new Error('Failed to "fetch" categories for vendor');
-                }
-            const data = await response.json();
-            setCategories(data);
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        } finally {
-            setLoading(false);
-        }
     };
 
     // API Call placeholder
     // Expected input
     //   category: string,
+    //   vendor: string,
     //   productName: string,
     //   price: string,
     //   quantity: string,
     //   description: string
     const sendProductToSQL = async (product) => {
-        try {
-            const url = 'http://localhost:8080/products';
-    
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json', 
-                },
-                body: JSON.stringify(product), 
-            });
-    
-            if (!response.ok) {
-                throw new Error(`Failed to send product data: ${response.status}`);
-            }
-            console.log('Product data sent successfully:', product); //replace with front end banner
-        } catch (error) {
-            console.error('Error sending product data:', error); //replace with front end banner
-            
-        }
+        // API call logic
+        // console.log might need to be replaced by the API call to the backend
+        // because it is interacting with the database directly?
+        console.log("sending product to SQL server:", product);
     };
 
     // Expected input: vendorName string
@@ -141,9 +99,11 @@ function App() {
 
     // this is to load the initial vendor and category data from the database
     useEffect(() => {
+        // need to be replaced with API calls that get a list of 
+        // vendors and categories
         const fetchInitialData = async () => {
             await fetchVendors();
-            // await fetchCategories();
+            await fetchCategories();
         };
        // calling fetch initial data function 
         fetchInitialData();
@@ -152,52 +112,16 @@ function App() {
     // Expected output: updates the 'vendors' state with a list of current vendors
     // API call to fetch vendors from sql database
     const fetchVendors = async() => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            const response = await fetch("http://localhost:8080/vendors"); //probably a better way to do this
-            
-            if (!response.ok) {
-                throw new Error('Failed to fetch vendors');
-            }
-
-            const data = await response.json();
-
-            setVendors(data);
-            console.log(data);
-
-            setLoading(false);
-        } catch (error) {
-            setError('An error occurred while fetching vendors: ' + error.message);
-            setLoading(false);
-        }
+        // API call from main.go
+        // will need to add try catch for error handling
         console.log("fetched and updated list of current vendors:");
     };
     
     // Expected output: updates the 'categories' state with a list of current categories
     // API call to categories vendors from sql database
     const fetchCategories = async() => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            const response = await fetch("http://localhost:8080/categories"); //probably a better way to do this
-            
-            if (!response.ok) {
-                throw new Error('Failed to fetch categories');
-            }
-
-            const data = await response.json();
-
-            setCategories(data);
-            console.log(data);
-
-            setLoading(false);
-        } catch (error) {
-            setError('An error occurred while fetching categories: ' + error.message);
-            setLoading(false);
-        }
+        // API call from main.go
+        // will need to add try catch for error handling
         console.log("fetched and updated list of current categories:");
     };
 
@@ -222,9 +146,9 @@ function App() {
                         onChange={handleInputChange}
                     >
                         <option value="">Select Vendor</option>
-                        {Object.entries(vendors).map(([vendorId, vendorName]) => (
-                            <option key={vendorId} value={vendorId}>
-                                {vendorName}
+                        {vendors.map((vendor) => (
+                            <option key={vendor.id} value={vendor.id}>
+                                {vendor.name}
                             </option>
                         ))}
                     </select>
@@ -234,14 +158,11 @@ function App() {
                         name="category"
                         value={newProduct.category}
                         onChange={handleInputChange}
-                        // disabling category drop down because a vendor needs
-                        // to be selected first
-                        disabled={!newProduct.vendor}
                     >
                         <option value="">Select Category</option>
-                        {Object.entries(categories).map(([categoryId, categoryName]) => (
-                            <option key={categoryId} value={categoryName}>
-                                {categoryName}
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                                {category.name}
                             </option>
                         ))}
                     </select>
