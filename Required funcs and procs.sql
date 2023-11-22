@@ -11,19 +11,6 @@ BEGIN
 END //
 DELIMITER ;
 
-
-/*--Broken
-DELIMITER //
-CREATE PROCEDURE GetCategoryID(IN CatName CHAR(45), OUT CatID INT)
-BEGIN
-    SELECT Category_ID
-    INTO CatID
-    FROM categories
-    WHERE Cat_Name = CatName;
-END //
-DELIMITER ;
-*/
-
 DELIMITER //
 CREATE PROCEDURE GetCatID(IN CatName CHAR(45), OUT CatID INT)
 BEGIN
@@ -53,4 +40,63 @@ BEGIN
 END //
 DELIMITER ;
 
+-- New Procedures as of 11/19
 
+DELIMITER //
+CREATE PROCEDURE GetHashyPassy(IN pt_user VARCHAR(20), pt_pass VARCHAR(64))
+BEGIN
+SET @input_password := pt_pass; 
+SET @salt := (SELECT Salt FROM logincreds WHERE Username = pt_user); 
+SET @hashed_input_password := SHA2(CONCAT(@input_password, @salt), 224); 
+SELECT Username FROM logincreds WHERE Username = pt_user AND HashPass = @hashed_input_password; 
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE RegisterUser(IN pt_user VARCHAR(20), pt_pass VARCHAR(64), ID INT)
+BEGIN
+SET @provideduser := pt_user; 
+SET @userpassword := pt_pass;
+SET @userid := ID; 
+SET @salt := generate_random_hash();
+SET @hashed_password := SHA2(CONCAT(@userpassword, @salt), 224);
+INSERT INTO logincreds (Username, HashPass, Salt, Employee_ID) VALUES (@provideduser, @hashed_password, @salt, @userid);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE InsertNewProduct(IN i VARCHAR(45), n VARCHAR(45), p FLOAT, q INT, d VARCHAR(255))
+BEGIN
+SET @Category := i;
+SET @pname := n;
+SET @pprice := p;
+SET @pqty := q;
+SET @pdesc := d;
+CALL GetCatID(@Category, @CatID);
+INSERT INTO products
+Values (0, @CatID, @pname, @pprice, @pqty, @pdesc);
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE UpdateProduct(IN i VARCHAR(45), n VARCHAR(45), p FLOAT, q INT, d VARCHAR(255))
+BEGIN
+SET @pid := i;
+SET @pname := n;
+SET @pprice := p;
+SET @pqty := q;
+SET @pdesc := d;
+UPDATE products
+SET Prod_Name = @pname, Prod_Price = @pprice, Prod_qty = @pqty, Prod_Desc = @pdesc
+WHERE Product_ID = @pid;
+END //
+DELIMITER ;
+
+DELIMITER //
+CREATE PROCEDURE DeleteProduct(IN i INT)
+BEGIN
+SET @pid := i;
+DELETE FROM products
+WHERE Product_ID = @pid;
+END //
+DELIMITER ;
