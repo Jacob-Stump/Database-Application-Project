@@ -15,7 +15,7 @@ DELIMITER //
 CREATE PROCEDURE GetCatID(IN CatName CHAR(45), OUT CatID INT)
 BEGIN
     SELECT Category_ID
-    INTO CatID
+    INTO CatIDUpdateProduct
     FROM categories
     WHERE Cat_Name = CatName;
 END //
